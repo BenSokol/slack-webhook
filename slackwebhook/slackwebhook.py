@@ -4,7 +4,7 @@
 # @Email:    ben@bensokol.com
 # @Created:  September 10th, 2020 [6:56pm]
 # @Modified: January 31th, 2022 [10:19pm]
-# @Version:  1.0.0
+# @Version:  1.0.1
 #
 # Copyright (C) 2020-2022 by Ben Sokol. All Rights Reserved.
 
@@ -128,7 +128,7 @@ message
   else:
     logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(module)s - %(levelname)s - %(message)s')
 
-  if args.message is None and args.message is None and args.message is None:
+  if args.message is None and args.subtitle is None and args.subtext is None:
     parser.error("At least 1 message option is required.")
     logging.shutdown()
     parser.exit(ReturnCode.error)
