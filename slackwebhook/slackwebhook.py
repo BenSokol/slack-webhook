@@ -56,16 +56,16 @@ def send_message(webhook: pathlib.Path, message: str, subtitle: str, subtext: st
   data: Data = {}
   if message is not None:
     logging.info("message: " + message)
-    data["text"] = message
+    data["text"] = message.replace('\\n', '\n')
 
   if subtitle is not None or subtext is not None:
     data["attachments"] = [{}]
     if subtitle is not None:
       logging.info("subtitle: " + subtitle)
-      data["attachments"][0]["title"] = subtitle
+      data["attachments"][0]["title"] = subtitle.replace('\\n', '\n')
     if subtext is not None:
       logging.info("subtext: " + subtext)
-      data["attachments"][0]["text"] = subtext
+      data["attachments"][0]["text"] = subtext.replace('\\n', '\n')
 
   data = json.dumps(data)
   logging.debug("data: " + pprint.pformat(data))
