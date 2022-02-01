@@ -2,7 +2,7 @@
 
 Sends a message to a specified slack webhook
 
-Install using
+Install
 ```console
-pip3 git+https://github.com/BenSokol/slack-webhook.git
+sudo pip3 install git+https://git.bensokol.com/slack.git
 ```
