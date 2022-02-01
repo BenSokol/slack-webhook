@@ -71,16 +71,21 @@ def send_message(webhook: pathlib.Path, message: str, subtitle: str, subtext: st
   logging.debug("data: " + pprint.pformat(data))
   if not noexec:
     result: typing.Union[None, str] = None
+    request = None
     try:
       req = urllib.request.Request(
         url,
         data=data.encode(),
         headers={"Content-type": "application/json"},
         method="POST")
-      result = urllib.request.urlopen(req).read().decode()
+      request = urllib.request.urlopen(req)
+      result = request.read().decode()
     except urllib.error.URLError:
-      logging.error("Invalid webhook url")
-      return ReturnCode.error
+      logging.error("URLError: Invalid webhook URL")
+      result = 'error'
+    finally:
+      if request is not None:
+        request.close()
 
     if result == 'ok':
       logging.info("Result: " + result)
