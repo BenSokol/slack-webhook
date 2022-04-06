@@ -3,8 +3,7 @@
 # @Author:   Ben Sokol
 # @Email:    ben@bensokol.com
 # @Created:  September 10th, 2020 [6:56pm]
-# @Modified: January 31th, 2022 [10:19pm]
-# @Version:  1.0.1
+# @Version:  1.0.4
 #
 # Copyright (C) 2020-2022 by Ben Sokol. All Rights Reserved.
 
@@ -26,6 +25,8 @@ import urllib.request
 
 __all__ = ["send_message"]
 
+logger = logging.getLogger(__name__)
+
 
 class ReturnCode(enum.IntEnum):
     success = 0
@@ -44,31 +45,31 @@ class Data(typing.TypedDict):
 
 def send_message(webhook: pathlib.Path, message: str, subtitle: str, subtext: str, noexec: bool = False) -> ReturnCode:
   url = None
-  logging.debug("Webhook: " + str(webhook).replace(os.path.expanduser('~'), '~'))
+  logger.debug("Webhook: " + str(webhook).replace(os.path.expanduser('~'), '~'))
   with open(webhook.expanduser(), 'r') as file:
     url = file.read().replace('\n', '')
-    logging.debug("Url: " + url)
+    logger.debug("Url: " + url)
 
   if url is None:
-    logging.error("Failed to obtain url")
+    logger.error("Failed to obtain url")
     return ReturnCode.error
 
   data: Data = {}
   if message is not None:
-    logging.info("message: " + message)
+    logger.info("message: " + message)
     data["text"] = message.replace('\\n', '\n')
 
   if subtitle is not None or subtext is not None:
     data["attachments"] = [{}]
     if subtitle is not None:
-      logging.info("subtitle: " + subtitle)
+      logger.info("subtitle: " + subtitle)
       data["attachments"][0]["title"] = subtitle.replace('\\n', '\n')
     if subtext is not None:
-      logging.info("subtext: " + subtext)
+      logger.info("subtext: " + subtext)
       data["attachments"][0]["text"] = subtext.replace('\\n', '\n')
 
   data = json.dumps(data)
-  logging.debug("data: " + pprint.pformat(data))
+  logger.debug("data: " + pprint.pformat(data))
   if not noexec:
     result: typing.Union[None, str] = None
     request = None
@@ -81,16 +82,16 @@ def send_message(webhook: pathlib.Path, message: str, subtitle: str, subtext: st
       request = urllib.request.urlopen(req)
       result = request.read().decode()
     except urllib.error.URLError:
-      logging.error("URLError: Invalid webhook URL")
+      logger.error("URLError: Invalid webhook URL")
       result = 'error'
     finally:
       if request is not None:
         request.close()
 
     if result == 'ok':
-      logging.info("Result: " + result)
+      logger.info("Result: " + result)
     else:
-      logging.error("Result: " + result)
+      logger.error("Result: " + result)
       return ReturnCode.error
 
   return ReturnCode.success
@@ -98,7 +99,6 @@ def send_message(webhook: pathlib.Path, message: str, subtitle: str, subtext: st
 
 def main() -> typing.NoReturn:
   """ Main script entry point. """
-
   default_slack_webhook_filename = "~/.config/slackwebhook"
   default_slack_webhook_filename_path = pathlib.Path(default_slack_webhook_filename).expanduser()
 
@@ -139,9 +139,9 @@ message
     parser.exit(ReturnCode.error)
 
   if not pathlib.Path(args.webhook).expanduser().exists():
-    logging.error("ERROR: Unable to locate a webhook at " + str(args.webhook))
-    logging.error("       The file should only contain the full url of the webhook")
-    logging.error("       Slack Incoming WebHooks 'https://slack.com/apps/A0F7XDUAZ-incoming-webhooks'")
+    logger.error("ERROR: Unable to locate a webhook at " + str(args.webhook))
+    logger.error("       The file should only contain the full url of the webhook")
+    logger.error("       Slack Incoming WebHooks 'https://slack.com/apps/A0F7XDUAZ-incoming-webhooks'")
     logging.shutdown()
     sys.exit(ReturnCode.error)
 
