@@ -26,6 +26,16 @@ import urllib.request
 __all__ = ["send_message"]
 
 logger = logging.getLogger(__name__)
+logging.addLevelName(logging.DEBUG - 1, "DEBUG")
+logging.addLevelName(logging.INFO - 1, "INFO")
+
+
+def logger_debug(*args, **kwargs):
+  logger.log(logging.DEBUG - 1, *args, **kwargs)
+
+
+def logger_info(*args, **kwargs):
+  logger.log(logging.INFO - 1, *args, **kwargs)
 
 
 class ReturnCode(enum.IntEnum):
@@ -45,10 +55,10 @@ class Data(typing.TypedDict):
 
 def send_message(webhook: pathlib.Path, message: str, subtitle: str, subtext: str, noexec: bool = False) -> ReturnCode:
   url = None
-  logger.debug("Webhook: " + str(webhook).replace(os.path.expanduser('~'), '~'))
+  logger_debug("Webhook: " + str(webhook).replace(os.path.expanduser('~'), '~'))
   with open(webhook.expanduser(), 'r') as file:
     url = file.read().replace('\n', '')
-    logger.debug("Url: " + url)
+    logger_debug("Url: " + url)
 
   if url is None:
     logger.error("Failed to obtain url")
@@ -56,20 +66,20 @@ def send_message(webhook: pathlib.Path, message: str, subtitle: str, subtext: st
 
   data: Data = {}
   if message is not None:
-    logger.info("message: " + message)
+    logger_info("message: " + message)
     data["text"] = message.replace('\\n', '\n')
 
   if subtitle is not None or subtext is not None:
     data["attachments"] = [{}]
     if subtitle is not None:
-      logger.info("subtitle: " + subtitle)
+      logger_info("subtitle: " + subtitle)
       data["attachments"][0]["title"] = subtitle.replace('\\n', '\n')
     if subtext is not None:
-      logger.info("subtext: " + subtext)
+      logger_info("subtext: " + subtext)
       data["attachments"][0]["text"] = subtext.replace('\\n', '\n')
 
   data = json.dumps(data)
-  logger.debug("data: " + pprint.pformat(data))
+  logger_debug("data: " + pprint.pformat(data))
   if not noexec:
     result: typing.Union[None, str] = None
     request = None
@@ -89,7 +99,7 @@ def send_message(webhook: pathlib.Path, message: str, subtitle: str, subtext: st
         request.close()
 
     if result == 'ok':
-      logger.info("Result: " + result)
+      logger_info("Result: " + result)
     else:
       logger.error("Result: " + result)
       return ReturnCode.error
@@ -127,11 +137,10 @@ message
   dev_options.add_argument('--verbose', '-v', action="store_true", help="Prints additional information.", default=False)
 
   args = parser.parse_args()
-
   if args.verbose:
-    logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(filename)s:%(lineno)d - %(levelname)s - %(message)s')
+    logging.basicConfig(level=logging.DEBUG - 1, format='%(asctime)s - %(filename)s:%(lineno)d - %(levelname)s - %(message)s')
   else:
-    logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(module)s - %(levelname)s - %(message)s')
+    logging.basicConfig(level=logging.INFO - 1, format='%(asctime)s - %(module)s - %(levelname)s - %(message)s')
 
   if args.message is None and args.subtitle is None and args.subtext is None:
     parser.error("At least 1 message option is required.")
