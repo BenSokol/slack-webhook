@@ -9,8 +9,8 @@
 
 import sys
 if (sys.version_info < (3, 0)):
-    print("Slack requires python3\n\npython3 " + ' '.join(sys.argv) + "\n")
-    sys.exit(100)
+  print("Slack requires python3\n\npython3 " + ' '.join(sys.argv) + "\n")
+  sys.exit(100)
 
 import argparse
 import enum
@@ -39,8 +39,8 @@ def logger_info(*args, **kwargs):
 
 
 class ReturnCode(enum.IntEnum):
-    success = 0
-    error = 1
+  success = 0
+  error = 1
 
 
 class Attachments(typing.TypedDict):
@@ -53,7 +53,7 @@ class Data(typing.TypedDict):
   attachments: typing.List[Attachments]
 
 
-def send_message(webhook: pathlib.Path, message: str, subtitle: str, subtext: str, noexec: bool = False) -> ReturnCode:
+def send_message(webhook: pathlib.Path, message: str, subtitle: str, subtext: str, noexec: bool = False, timeout: int = 10) -> ReturnCode:
   url = None
   logger_debug("Webhook: " + str(webhook).replace(os.path.expanduser('~'), '~'))
   with open(webhook.expanduser(), 'r') as file:
@@ -89,7 +89,7 @@ def send_message(webhook: pathlib.Path, message: str, subtitle: str, subtext: st
         data=data.encode(),
         headers={"Content-type": "application/json"},
         method="POST")
-      request = urllib.request.urlopen(req)
+      request = urllib.request.urlopen(req, timeout=timeout)
       result = request.read().decode()
     except urllib.error.URLError:
       logger.error("URLError: Invalid webhook URL")
