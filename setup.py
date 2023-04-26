@@ -8,10 +8,13 @@ setuptools.setup(
   version='1.0.6',
   author='Ben Sokol',
   author_email='ben@bensokol.com',
+  maintainer='Ben Sokol',
+  maintainer_email='ben@bensokol.com',
   description='Send messages to a slack webhook',
   long_description=long_description,
   long_description_content_type="text/markdown",
   url='https://git.bensokol.com/slackwebhook',
+  download_url='https://git.bensokol.com/slackwebhook',
   project_urls={
     "Bug Tracker": "https://git.bensokol.com/slackwebhook/issues"
   },
