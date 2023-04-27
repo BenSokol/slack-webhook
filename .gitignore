@@ -1,4 +1,5 @@
 build/
 dist/
+deb_dist/
 *.egg-info
 slackwebhook/__pycache__
