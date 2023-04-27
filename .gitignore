@@ -3,3 +3,4 @@ dist/
 deb_dist/
 *.egg-info
 slackwebhook/__pycache__
+./*.tar.gz
