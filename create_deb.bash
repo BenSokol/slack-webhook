@@ -11,11 +11,11 @@ echo "dist-dir: ${SRC}" >> ./setup.cfg
 
 python3 setup.py --command-packages=stdeb.command bdist_deb
 
-debsign -k ${GPG_KEY} --re-sign ${SRC}/slackwebhook_1.0.7-1_amd64.changes
-debsign -k ${GPG_KEY} --re-sign ${SRC}/slackwebhook_1.0.7-1_source.changes
-debsign -k ${GPG_KEY} --re-sign ${SRC}/slackwebhook_1.0.7-1.dsc
-#debsign -k 1C6BFAD873C7B6D2241FEFDA2DBA02F97C909F11 --re-sign ${SRC}/
-debsigs --sign=origin -k ${GPG_KEY} ${SRC}/python3-slackwebhook_1.0.7-1_all.deb
+debsign -k ${GPG_KEY} --re-sign ${SRC}/slackwebhook_${__SLACK_WEBHOOK_VERSION__}-1_amd64.changes
+debsign -k ${GPG_KEY} --re-sign ${SRC}/slackwebhook_${__SLACK_WEBHOOK_VERSION__}-1_source.changes
+debsign -k ${GPG_KEY} --re-sign ${SRC}/slackwebhook_${__SLACK_WEBHOOK_VERSION__}-1.dsc
+
+debsigs --sign=origin -k ${GPG_KEY} ${SRC}/python3-slackwebhook_${__SLACK_WEBHOOK_VERSION__}-1_all.deb
 
 mkdir -p ${DEST}
 cp ${SRC}/*.deb  ${DEST}
