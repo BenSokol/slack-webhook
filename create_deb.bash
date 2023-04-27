@@ -1,26 +1,24 @@
 __SLACK_WEBHOOK_VERSION__=$(python3 setup.py --version)
 
-SRC_ROOT=deb_dist/${__SLACK_WEBHOOK_VERSION__}
-APT_REPO_ROOT=~/www/bensokol.com/public/deb.bensokol.com
+SRC=deb_dist/${__SLACK_WEBHOOK_VERSION__}
+DEST=~/www/bensokol.com/public/deb.bensokol.com/debian/pool/main/python3-slackwebhook/
+
+GPG_KEY=1C6BFAD873C7B6D2241FEFDA2DBA02F97C909F11
 
 echo "[sdist_dsc]" > ./setup.cfg
 echo "compat: 10" >> ./setup.cfg
-echo "dist-dir: ${SRC_ROOT}" >> ./setup.cfg
+echo "dist-dir: ${SRC}" >> ./setup.cfg
 
-SRC_DEB_FILE=${SRC_ROOT}/python3-slackwebhook_${__SLACK_WEBHOOK_VERSION__}-1_all.deb
-SRC_ORG_TAR_XZ_FILE=${SRC_ROOT}/slackwebhook_${__SLACK_WEBHOOK_VERSION__}.orig.tar.gz
-SRC_DEB_TAR_XZ_FILE=${SRC_ROOT}/slackwebhook_${__SLACK_WEBHOOK_VERSION__}-1.debian.tar.xz
-SRC_DSC_FILE=${SRC_ROOT}/slackwebhook_${__SLACK_WEBHOOK_VERSION__}-1.dsc
-
-DEST_DEB_FILE=${APT_REPO_ROOT}/pool/main/python3-slackwebhook/python3-slackwebhook_${__SLACK_WEBHOOK_VERSION__}-1_all.deb
-DEST_ORG_TAR_XZ_FILE=${APT_REPO_ROOT}/pool/main/python3-slackwebhook/python3-slackwebhook_${__SLACK_WEBHOOK_VERSION__}.orig.tar.gz
-DEST_DEB_TAR_XZ_FILE=${APT_REPO_ROOT}/pool/main/python3-slackwebhook/python3-slackwebhook_${__SLACK_WEBHOOK_VERSION__}-1.debian.tar.xz
-DEST_DSC_FILE=${APT_REPO_ROOT}/pool/main/python3-slackwebhook/python3-slackwebhook_${__SLACK_WEBHOOK_VERSION__}-1.dsc
-
-python3 setup.py build
 python3 setup.py --command-packages=stdeb.command bdist_deb
 
-#cp ${SRC_DEB_FILE}        ${DEST_DEB_FILE}
-#cp ${SRC_ORG_TAR_XZ_FILE} ${DEST_ORG_TAR_XZ_FILE}
-#cp ${SRC_DEB_TAR_XZ_FILE} ${DEST_DEB_TAR_XZ_FILE}
-#cp ${SRC_DSC_FILE}        ${DEST_DSC_FILE}
+debsign -k ${GPG_KEY} --re-sign ${SRC}/slackwebhook_1.0.7-1_amd64.changes
+debsign -k ${GPG_KEY} --re-sign ${SRC}/slackwebhook_1.0.7-1_source.changes
+debsign -k ${GPG_KEY} --re-sign ${SRC}/slackwebhook_1.0.7-1.dsc
+#debsign -k 1C6BFAD873C7B6D2241FEFDA2DBA02F97C909F11 --re-sign ${SRC}/
+debsigs --sign=origin -k ${GPG_KEY} ${SRC}/python3-slackwebhook_1.0.7-1_all.deb
+
+mkdir -p ${DEST}
+cp ${SRC}/*.deb  ${DEST}
+cp ${SRC}/*.tar.xz ${DEST}
+cp ${SRC}/*.tar.gz ${DEST}
+cp ${SRC}/*.dsc ${DEST}
