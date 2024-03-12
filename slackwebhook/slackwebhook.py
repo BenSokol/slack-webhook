@@ -3,7 +3,6 @@
 # @Author:   Ben Sokol
 # @Email:    ben@bensokol.com
 # @Created:  September 10th, 2020 [6:56pm]
-# @Version:  1.0.4
 #
 # Copyright (C) 2020-2022 by Ben Sokol. All Rights Reserved.
 
@@ -53,7 +52,7 @@ class Data(typing.TypedDict):
   attachments: typing.List[Attachments]
 
 
-def send_message(webhook: pathlib.Path, message: str, subtitle: str, subtext: str, noexec: bool = False, timeout: int = 10) -> ReturnCode:
+def send_message(webhook: pathlib.Path, markdown: bool, message: str, subtitle: str, subtext: str, noexec: bool = False, timeout: int = 10) -> ReturnCode:
   url = None
   logger_debug("Webhook: " + str(webhook).replace(os.path.expanduser('~'), '~'))
   with open(webhook.expanduser(), 'r') as file:
@@ -68,6 +67,8 @@ def send_message(webhook: pathlib.Path, message: str, subtitle: str, subtext: st
   if message is not None:
     logger_info("message: " + message)
     data["text"] = message.replace('\\n', '\n')
+    if markdown:
+      data["type"] = "mrkdwn"
 
   if subtitle is not None or subtext is not None:
     data["attachments"] = [{}]
@@ -77,6 +78,8 @@ def send_message(webhook: pathlib.Path, message: str, subtitle: str, subtext: st
     if subtext is not None:
       logger_info("subtext: " + subtext)
       data["attachments"][0]["text"] = subtext.replace('\\n', '\n')
+    if markdown:
+        data["attachments"][0]["type"] = "mrkdwn"
 
   data = json.dumps(data)
   logger_debug("data: " + pprint.pformat(data))
@@ -128,6 +131,7 @@ message
   message_options.add_argument('--message', '-m', action='store', help='The message', default=None)
   message_options.add_argument('--subtitle', action='store', help='The title of the nested message', default=None)
   message_options.add_argument('--subtext', action='store', help='The text of the nested message', default=None)
+  message_options.add_argument('--markdown', action='store_true', help='Use markdown for message contents', default=False)
 
   configuration_options = parser.add_argument_group("Configuration options")
   configuration_options.add_argument('--webhook', action='store', type=pathlib.Path, help="The webhook to use. (Default: " + default_slack_webhook_filename + ")", default=default_slack_webhook_filename_path)
@@ -154,7 +158,7 @@ message
     logging.shutdown()
     sys.exit(ReturnCode.error)
 
-  ret_code = send_message(webhook=args.webhook, message=args.message, subtitle=args.subtitle, subtext=args.subtext, noexec=args.noexec)
+  ret_code = send_message(webhook=args.webhook, markdown=args.markdown, message=args.message, subtitle=args.subtitle, subtext=args.subtext, noexec=args.noexec)
   logging.shutdown()
   sys.exit(ret_code)
 
