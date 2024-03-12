@@ -22,3 +22,5 @@ cp ${SRC}/*.deb  ${DEST}
 cp ${SRC}/*.tar.xz ${DEST}
 cp ${SRC}/*.tar.gz ${DEST}
 cp ${SRC}/*.dsc ${DEST}
+
+rm slackwebhook-${__SLACK_WEBHOOK_VERSION__}.tar.gz

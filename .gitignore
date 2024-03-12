@@ -5,3 +5,4 @@ deb_dist/
 slackwebhook/__pycache__
 ./*.tar.gz
 ./setup.cfg
+setup.cfg
