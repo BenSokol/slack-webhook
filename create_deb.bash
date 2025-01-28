@@ -1,7 +1,7 @@
 __SLACK_WEBHOOK_VERSION__=$(python3 setup.py --version)
 
 SRC=deb_dist/${__SLACK_WEBHOOK_VERSION__}
-DEST=~/www/bensokol.com/public/deb.bensokol.com/debian/pool/main/python3-slackwebhook/
+DEST=~/www/bensokol.com/deb.bensokol.com/debian/pool/main/python3-slackwebhook/
 
 GPG_KEY=1C6BFAD873C7B6D2241FEFDA2DBA02F97C909F11
 
