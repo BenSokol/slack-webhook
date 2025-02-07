@@ -64,7 +64,7 @@ def has_internet(url="1.1.1.1", port=53, timeout=5):
 
 def send_message(webhook: pathlib.Path, markdown: bool, message: str, subtitle: str, subtext: str, noexec: bool = False, timeout: int = 10) -> ReturnCode:
   if not pathlib.Path(webhook).expanduser().exists():
-    logger.error("ERROR: Unable to locate a webhook at " + str(args.webhook))
+    logger.error("ERROR: Unable to locate a webhook at " + str(webhook))
     logger.error("       The file should only contain the full url of the webhook")
     logger.error("       Slack Incoming WebHooks 'https://slack.com/apps/A0F7XDUAZ-incoming-webhooks'")
     return ReturnCode.error
