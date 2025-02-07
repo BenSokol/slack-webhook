@@ -23,7 +23,7 @@ import sys
 import typing
 import urllib.request
 
-__all__ = ["send_message"]
+__all__ = ["send_message", "main"]
 
 logger = logging.getLogger(__name__)
 logging.addLevelName(logging.DEBUG - 1, "DEBUG")
