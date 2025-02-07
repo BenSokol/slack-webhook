@@ -18,6 +18,7 @@ import logging
 import os
 import pathlib
 import pprint
+import socket
 import sys
 import typing
 import urllib.request
@@ -52,7 +53,22 @@ class Data(typing.TypedDict):
   attachments: typing.List[Attachments]
 
 
+def has_internet(url="1.1.1.1", port=53, timeout=5):
+  try:
+    socket.setdefaulttimeout(timeout)
+    socket.socket(socket.AF_INET, socket.SOCK_STREAM).connect((url, port))
+    return True
+  except socket.error:
+    return False
+
+
 def send_message(webhook: pathlib.Path, markdown: bool, message: str, subtitle: str, subtext: str, noexec: bool = False, timeout: int = 10) -> ReturnCode:
+  if not pathlib.Path(webhook).expanduser().exists():
+    logger.error("ERROR: Unable to locate a webhook at " + str(args.webhook))
+    logger.error("       The file should only contain the full url of the webhook")
+    logger.error("       Slack Incoming WebHooks 'https://slack.com/apps/A0F7XDUAZ-incoming-webhooks'")
+    return ReturnCode.error
+
   url = None
   logger_debug("Webhook: " + str(webhook).replace(os.path.expanduser('~'), '~'))
   with open(webhook.expanduser(), 'r') as file:
@@ -87,6 +103,9 @@ def send_message(webhook: pathlib.Path, markdown: bool, message: str, subtitle: 
     result: typing.Union[None, str] = None
     request = None
     try:
+      if not has_internet():
+        logger.error("No internet...")
+        return
       req = urllib.request.Request(
         url,
         data=data.encode(),
@@ -150,13 +169,6 @@ message
     parser.error("At least 1 message option is required.")
     logging.shutdown()
     parser.exit(ReturnCode.error)
-
-  if not pathlib.Path(args.webhook).expanduser().exists():
-    logger.error("ERROR: Unable to locate a webhook at " + str(args.webhook))
-    logger.error("       The file should only contain the full url of the webhook")
-    logger.error("       Slack Incoming WebHooks 'https://slack.com/apps/A0F7XDUAZ-incoming-webhooks'")
-    logging.shutdown()
-    sys.exit(ReturnCode.error)
 
   ret_code = send_message(webhook=args.webhook, markdown=args.markdown, message=args.message, subtitle=args.subtitle, subtext=args.subtext, noexec=args.noexec)
   logging.shutdown()
