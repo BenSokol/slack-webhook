@@ -5,7 +5,7 @@ with open("README.md", "r", encoding="utf-8") as fh:
 
 setuptools.setup(
   name='slackwebhook',
-  version='1.3.7',
+  version='1.3.8',
   author='Ben Sokol',
   author_email='ben@bensokol.com',
   maintainer='Ben Sokol',
