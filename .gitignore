@@ -3,6 +3,6 @@ dist/
 deb_dist/
 *.egg-info
 slackwebhook/__pycache__
-./*.tar.gz
-./setup.cfg
+*.tar.gz
 setup.cfg
+get-pip.py
