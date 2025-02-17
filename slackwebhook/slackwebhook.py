@@ -60,6 +60,9 @@ def has_internet(url="1.1.1.1", port=53, timeout=5):
     return True
   except socket.error:
     return False
+  except:
+    logger.error("Unknown error occured in has_internet")
+    return False
 
 
 def send_message(webhook: pathlib.Path, markdown: bool, message: str, subtitle: str, subtext: str, noexec: bool = False, timeout: int = 10) -> ReturnCode:
@@ -115,6 +118,12 @@ def send_message(webhook: pathlib.Path, markdown: bool, message: str, subtitle: 
       result = request.read().decode()
     except urllib.error.URLError:
       logger.error("URLError: Invalid webhook URL")
+      result = 'error'
+    except ConnectionResetError as e:
+      logger.error("ConnectionResetError: Likely no internet.  Try again...")
+      result = 'error'
+    except TimeoutError as e:
+      logger.error("TimeoutError: Timeout")
       result = 'error'
     finally:
       if request is not None:
